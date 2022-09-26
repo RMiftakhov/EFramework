@@ -87,4 +87,4 @@ with st.sidebar:
     - **Seismic Type:** {}
     - **Seismic Name:** {}
     """.format(st.session_state.seismic_type if 'seismic_type' in st.session_state else "--", \
-        os.path.basename(filename) if 'filename' in st.session_state else "--"))
+        os.path.basename(st.session_state.filename) if 'filename' in st.session_state else "--"))

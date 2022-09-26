@@ -1,4 +1,4 @@
-from random import randint
+
 import plotly.express as px
 import streamlit as st
 import numpy as np
@@ -18,27 +18,33 @@ class VISUALIZATION:
         self._sample_rate = _seismic_data.get_sample_rate()
         self._cmap_option = "gray"
 
-    def plot_slice(self,_segyfile, inline_indx, iline_old, xline_indx, xline_old, time_indx, t_old, cmap, vm):
+    def plot_slice(self,_segyfile, indx_old, indx_new, last_section, cmap, vm):
         seis = np.array([[[255, 0, 0], [0, 255, 0], [0, 0, 255]],
                         [[0, 255, 0], [0, 0, 255], [255, 0, 0]]
                     ], dtype=np.uint8)
         seis_plt = px.imshow(seis)
+        difference = np.abs(indx_old - indx_new)
+        if np.any(difference):
+            find_indx = np.nonzero(difference)[0]
+        else:
+            find_indx = [last_section]
 
-        if np.abs(iline_old - inline_indx) > 0:
-            iline_old = inline_indx
-            seis = _segyfile.get_iline(inline_indx).T
+        if find_indx[0] == 0:
+            seis = _segyfile.get_iline(indx_new[0]).T
             seis_plt = plot_inl(seis, cmap, -vm, vm)
-        elif np.abs(xline_old - xline_indx) > 0:
-            xline_old = xline_indx
-            seis = _segyfile.get_xline(xline_indx).T
+            last_section = 0
+        elif find_indx[0] == 1:
+            seis = _segyfile.get_xline(indx_new[1]).T
             seis_plt =  plot_xln(seis, cmap, -vm, vm)
-        elif np.abs(t_old - time_indx) > 0:
-            t_old = time_indx
-            seis = _segyfile.get_zslice(time_indx).T
+            last_section = 1
+        elif find_indx[0] == 2:
+            seis = _segyfile.get_zslice(indx_new[2]).T
             seis_plt = plot_top(seis,  cmap, -vm, vm)
+            last_section = 2
         seis_plt.update_layout(
             plot_bgcolor='rgba(0,0,0,0)')
-        return seis, seis_plt, iline_old, xline_old, t_old
+        indx_old = indx_new
+        return seis, seis_plt, indx_old, last_section
 
     def plotly_color_select(self):
         colorscales = ["gray", "Greys", "RdBu", "RdGy"] #px.colors.named_colorscales()
@@ -65,6 +71,8 @@ class VISUALIZATION:
             st.session_state.iline_old = 0
             st.session_state.xline_old = 0
             st.session_state.t_old = 0
+            # 1 - inline, 2 - xline, 3 - time
+            st.session_state.last_section = 0
 
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -73,8 +81,13 @@ class VISUALIZATION:
             xline_indx = st.slider('Xline', 0, n_xl-1, n_xl//2)
         with col3:
             time_indx = st.slider('Time', 0, n_samples-1, n_samples//2)
-        
-        seis, seis_3d_plot, st.session_state.iline_old, st.session_state.xline_old, st.session_state.t_old = self.plot_slice(seismic_data, inline_indx, st.session_state.iline_old, xline_indx, st.session_state.xline_old, time_indx, st.session_state.t_old, cmap=self._cmap_option, vm=vm)
+
+        index_old = np.array([st.session_state.iline_old, st.session_state.xline_old, st.session_state.t_old])
+        index_new = np.array([inline_indx, xline_indx, time_indx])
+        # print(f"indx_old - index_new {not np.any(index_old - index_new)}")
+        # print(f"indx_new {index_new}")
+        seis, seis_3d_plot, index_old, st.session_state.last_section = self.plot_slice(seismic_data, index_old, index_new, st.session_state.last_section, cmap=self._cmap_option, vm=vm)
+        st.session_state.iline_old, st.session_state.xline_old, st.session_state.t_old = index_old
         st.write(seis_3d_plot)
         if is_fspect:
             fspect_plt = self.plot_fspectra(seis, 'Original')
@@ -103,24 +116,32 @@ class VISUALIZATION:
         compare_two_fig_2D_helper(data1, data2, cmap_option, vm)
         if is_fspect:
             with st.expander("Amplitude spectra"):
-                fspect_plt = plot_fspectra(data1, data1_name, sample_rate, data2=data2, data2_name=data2_name)
+                smooth = 2.0
+                fspect_plt = plot_fspectra(data1, data1_name, sample_rate, smooth, data2=data2, data2_name=data2_name)
                 st.write(fspect_plt)
 
     def plot_fspectra(self, data1, data1_name):
         col1, col2, col3, col4, col5 = st.columns(5)
         smooth = col2.slider('Smoothing', 0.0, 4.0, 2.0)
         sample_rate = col1.number_input("Sample Rate", min_value=1, value=int(self._sample_rate/1000), format='%i')
-        col3.text((signaltonoise(data1)))
+        #col3.text((signaltonoise(data1)))
 
         fspect_plt = plot_fspectra(data1, data1_name, sample_rate, smooth)
-        st.write(fspect_plt)
+        return fspect_plt
+
     def plot_fspectra_2(self, data1, data1_name, data2, data2_name):
-        fspect_plt = plot_fspectra(data1, data1_name, int(self._sample_rate/1000), data2=data2, data2_name=data2_name)
-        st.write(fspect_plt)
+        col1, col2, col3, col4, col5 = st.columns(5)
+        smooth = col2.slider('Smoothing', 0.0, 4.0, 2.0)
+        sample_rate = col1.number_input("Sample Rate", min_value=1, value=int(self._sample_rate/1000), format='%i')
+        fspect_plt = plot_fspectra(data1, data1_name, sample_rate, smooth, data2=data2, data2_name=data2_name)
+        return fspect_plt
 
     def plot_fspectra_3(self, data1, data1_name, data2, data2_name, data3, data3_name):
-        fspect_plt = plot_fspectra(data1, data1_name, int(self._sample_rate/1000), data2=data2, data2_name=data2_name, data3=data3, data3_name=data3_name)
-        st.write(fspect_plt)
+        col1, col2, col3, col4, col5 = st.columns(5)
+        smooth = col2.slider('Smoothing', 0.0, 4.0, 2.0)
+        sample_rate = col1.number_input("Sample Rate", min_value=1, value=int(self._sample_rate/1000), format='%i')
+        fspect_plt = plot_fspectra(data1, data1_name, sample_rate, smooth, data2=data2, data2_name=data2_name, data3=data3, data3_name=data3_name)
+        return fspect_plt
 
 def plot_seis(seis, cmap, vmin, vmax): 
     seis_plot = px.imshow(seis, zmin=vmin, zmax=vmax, aspect='auto', labels=dict(x="Xline_idx", y="Time_idx", color="Amplitude"), color_continuous_scale=cmap)
@@ -180,5 +201,5 @@ def plot_fspectra(data1, data1_name, sample_rate, smooth, *args, **kwargs):
                         yaxis_title='Amplitude',
                         xaxis_range=[0,110],
                         )
-    print("sample_ratesample_ratesample_ratesample_rate, ", sample_rate)
+    # print("sample_ratesample_ratesample_ratesample_rate, ", sample_rate)
     return fig

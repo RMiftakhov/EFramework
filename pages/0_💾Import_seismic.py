@@ -5,38 +5,27 @@ from visualization_helpers import VISUALIZATION
 import os
 from data_classes import SegyIO3D, SegyIO2D, Numpy2D
 
-def get_segy_header(filename):
-    f = segyio.open(filename, ignore_geometry = True)
+def get_segy_header(file_name):
+    f = segyio.open(file_name, ignore_geometry = True)
     return segyio.tools.wrap(f.text[0])
     
-def get_inline_xline_position(filename):
-    f = segyio.open(filename, ignore_geometry = True)
-    ntraces    = len(f.trace)
-    inlines    = []
-    crosslines = []
+def get_inline_xline_position(file_name):
+    f = segyio.open(file_name, ignore_geometry = True)
+    _ntraces    = len(f.trace)
+    _inlines    = []
+    _crosslines = []
 
-    for i in range(ntraces):
+    for i in range(_ntraces):
         headeri = f.header[i]
-        inlines.append(headeri[segyio.su.iline])
-        crosslines.append(headeri[segyio.su.xline])
+        _inlines.append(headeri[segyio.su.iline])
+        _crosslines.append(headeri[segyio.su.xline])
 
-    print(f'{ntraces} traces')
-    print(f'first 10 inlines: {inlines[:10]}')
-    print(f'first 10 crosslines: {crosslines[:10]}')
+    print(f'{_ntraces} traces')
+    print(f'first 10 inlines: {_inlines[:10]}')
+    print(f'first 10 crosslines: {_crosslines[:10]}')
 
-    #The loop variable i is only used to look up the the right header, but segyio can manage this for us
-
-    inlines = []
-    crosslines = []
-    for h in f.header:
-        inlines.append(h[segyio.su.iline])
-        crosslines.append(h[segyio.su.xline])
-            
-    print(f'{ntraces} traces')
-    print(f'first 10 inlines: {inlines[:10]}')
-    print(f'first 10 crosslines: {crosslines[:10]}')
-
-    return inlines, crosslines
+    #The loop variable i is only used to look up the the right header, but segyio can manage this for u
+    return _inlines, _crosslines
 
 st.markdown("# 💾 Import Seismic from File")
 data_option= st.radio(
@@ -99,11 +88,11 @@ if data_option == 'Segy3D' or data_option == 'Segy2D':
                 
 
                 st.session_state.seismic = segyfile
-                st.success('Seems like the survey is read correctly. You can now enjoy AI/ML methods in this app!')
+                st.success('It appears that the survey is correctly read. AI/ML methods are now available in this app!')
                         
             except RuntimeError as err: 
-                    st.session_state.failed_seismic = True
-                    st.write("Oops!  Something went wrong.  Try again...", err)
+                st.session_state.failed_seismic = True
+                st.write("Oops!  Something went wrong.  Try again...", err)
 
 elif (data_option == 'Numpy2D'):
     st.title("Import Seismic As Numpy Array")
@@ -111,8 +100,7 @@ elif (data_option == 'Numpy2D'):
     if 'filename' not in st.session_state:
         st.session_state.filename = ''
     np_text = 'Please pass here the whole path like: C:/Ichthys 3D.npy'
-    segy_text = 'Please pass here the whole path like: C:/Ichthys 3D.segy'
-    filename = st.text_input(np_text if data_option=="Numpy2D" else segy_text, st.session_state.filename)
+    filename = st.text_input(np_text, st.session_state.filename)
 
     st.session_state.filename = filename
     st.write('The selected file is: ', filename)
@@ -128,17 +116,15 @@ elif (data_option == 'Numpy2D'):
             Viz = VISUALIZATION(seismic, st.session_state.seismic_type)
             Viz.visualize_seismic_2D(seismic.get_iline(), True)
 
-            st.success('Seems like the cube is read correctly. You can now enjoy AI/ML methods in this app!')
+            st.success('It appears that the survey is correctly read. AI/ML methods are now available in this app!')
         except RuntimeError as err: 
-                        st.write("Oops!  That was no valid number.  Try again...", err)
+            st.write("Oops!  That was no valid number.  Try again...", err)
 else:
     st.error("Not implemented.")
-
-    
+   
 with st.sidebar:
     col1, col2 = st.columns(2)
-    st.markdown("""
-    - **Seismic Type:** {}
-    - **Seismic Name:** {}
-    """.format(st.session_state.seismic_type if 'seismic_type' in st.session_state else "--", \
-        os.path.basename(filename) if 'filename' in st.session_state else "--"))
+    st.markdown(f"""
+    - **Seismic Type:** {st.session_state.seismic_type if 'seismic_type' in st.session_state else "--"}
+    - **Seismic Name:** {os.path.basename(filename) if 'filename' in st.session_state else "--"}
+    """ )

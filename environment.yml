@@ -8,4 +8,8 @@ dependencies:
   - plotly
   - segyio
   - scipy
+  - pip
+  - pip:
+    - matplotlib
+    - streamlit_image_comparison
 prefix: 
