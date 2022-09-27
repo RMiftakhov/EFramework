@@ -4,7 +4,7 @@ There are a lot of good tools out there, but how can people use them? 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/6owwDkEhkgg/0.jpg)](https://www.youtube.com/watch?v=6owwDkEhkgg)
 
 ## What is it? 
-This app serves as a framework to include some of the best **open-source** O&G AI/ML tools. It democritises the use of AI tools. It will challenge the status quo that you must be a skilled programmer to run open-source ML tools on your own data.
+This app serves as a framework to include some of the best **open-source** O&G AI/ML tools. It democritises the use of AI tools by lifting a need to be a skilled programmer to run open-source ML tools on your own data. 
 
 In most cases, I'll include code that allows you to enter the example data *(or your own)*, compute it, and save the results in each application.
 
