@@ -28,28 +28,26 @@ with col1:
 col1, col2 = st.columns(2)
 with col1:
     
-    st.markdown("I am **fascinated** by artificial intelligence and its applications in the oil and gas industry. I've spent the **5+** years learning, teaching, building, and deploying AI-based solutions for seismic interpretation, geological modeling, and reservoir simulation.", unsafe_allow_html=True)
-    st.markdown("In 2021, I started a YouTube channel where I cover all aspects of our industry (drilling, exploration, production, and reservoir) as well as hands-on AI/ML programming using Python and Tensorflow/PyTorch")
-    col1.markdown("The list of [Datasets](https://ruslanmiftakhov.com/blog#!/tfeeds/937619882821/c/Datasets) and [Tools](https://ruslanmiftakhov.com/blog#!/tfeeds/937619882821/c/Tools) I am updading from time to time on my website")
+    st.markdown("I am CTO at [Geoplat](https://geoplat.ai), and I am passionate about AI and its applications in the oil and gas industry. I have spent many years learning, teaching, developing, and launching AI-based solutions for geoscience and petroleum engineering.", unsafe_allow_html=True)
+    st.markdown("In 2021, I started a YouTube channel where I cover all aspects of our industry (drilling, exploration, production, and reservoir) as well as hands-on AI/ML programming using Python and Tensorflow/PyTorch.")
+    st.markdown("I am updading from time to time on my website: the list of [Open-Datasets](https://ruslanmiftakhov.com/blog#!/tfeeds/937619882821/c/Datasets) and [Open-Tools](https://ruslanmiftakhov.com/blog#!/tfeeds/937619882821/c/Tools).")
 with col2:
     st.video('https://youtu.be/6owwDkEhkgg')
 
 
-
 col11, col22, col33, col44 = st.columns(4)
-col33.markdown('## YouTube '+img_to_html('images/YouTube.jpg', 'https://www.youtube.com/channel/UC1HyCbG5SO4hC7b_Ddl8cGg?sub_confirmation=1'), unsafe_allow_html=True)
+col33.markdown('## YouTube '+img_to_html('images/Square-YouTube-Logo-PNG-1024x1024.png', 'https://www.youtube.com/channel/UC1HyCbG5SO4hC7b_Ddl8cGg?sub_confirmation=1'), unsafe_allow_html=True)
 col44.markdown('## LinkedIn '+img_to_html('images/linkedin.png', 'https://www.linkedin.com/in/ruslan-miftakhov/'), unsafe_allow_html=True)
 
 st.markdown('---')
 st.markdown('### What this app about❓')
 
-
-st.markdown('This app includes some of the best **open-source** O&G AI/ML tools so that you may test them out on your own data. \
-    In most cases, I will include code that allows you to input the sample data *(or your own)*, perform the computation, and save the results in each application.')
+st.markdown('This app serves as a framework to include some of the best **open-source** O&G AI/ML tools. It democritises the use of AI tools by lifting a need to be a skilled programmer to run open-source ML tools on your own data. \
+In most cases, I will include code that allows you to enter the example data (or your own), compute it, and save the results in each application.')
 
 col11, col22, col33 = st.columns(3)
 col11.markdown("""**Open AI/ML Algorithms** 
-- 2D Self Supervised Denoising by [Claire](https://cebirnie92.github.io/) (Links: [GitHub](https://github.com/swag-kaust/Transform2022_SelfSupervisedDenoising) and [YouTube](https://youtu.be/d9yv90-JCZ0))✔️ 
+- 2D Self Supervised Denoising by [Claire](https://cebirnie92.github.io/) (Links: [GitHub](https://github.com/swag-kaust/Transform2022_SelfSupervisedDenoising) and [YouTube](https://youtu.be/d9yv90-JCZ0))
 - 3D Seismic Fault Segmentation 
 - 3D Seismic Denoising+SuperResolution 
 - 2D/3D Seismic Facies Prediction
@@ -76,10 +74,22 @@ col33.markdown("""**Visualization**
 - Spectrum Frequency Plot ✔️
 - ...""")
  
+st.markdown(''' *The whole list of intended AI/ML applications:*
+| Geophysics | Petrophysics | Drilling Engineering | Reservoir Engineering | Production Engineering |
+| --- | --- | --- | --- | --- | 
+| 2D Self Supervised Denoising | Well-Log Lithology/Property Prediction | ROP Prediction/Optimization | Well-to-Well Interference | Predicting Well Rate Potential
+| 2D/3D Seismic Fault Segmentation | Well-Log Outlier detection | Drillstring-Vibration Prediction | Proxy Reservoir Simulation | Virtual Rate Metering
+| 2D/3D Seismic Denoising+SuperResolution | Well-Log Synthesis | Lost-Circulation Prediction | Reservoir Optimization | Predicting Well Failures 
+| 2D/3D Seismic Facies Prediction | Well-to-Well correlation | DPS Incident Detection | PVT | Predicting Critical Oil Rate
+| 3D Salt/Karst Delineation | | Real-Time Gas-Influx Detection | Decline Curve Analisys | Recommending Optimum Well Spacing in NFRs
+| Reconstruction of Missing Seismic Data | | Drillstring-Washout Detection | | Predicting Threshold Reservoir Radius
+| Neural Network for Acoustic Impedance prediction | | Abnormal-Drilling Detection | | Identification of Downhole Conditions in Sucker Rod Pumped Wells
+| First-Break Picking | | Drill-Fluid Design | | Prediction of Multilateral Inflow Control Valve Flow Performance
+''')
 
 
-image = Image.open('images/Check Out My AIML Solutions.png')
-col11.image(image)
+# image = Image.open('images/Check Out My AIML Solutions.png')
+# col11.image(image)
 
 with st.sidebar:
     col1, col2 = st.columns(2)

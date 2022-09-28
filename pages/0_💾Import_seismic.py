@@ -46,7 +46,7 @@ if data_option == 'Segy3D' or data_option == 'Segy2D':
         # This flag is raised if something went wrong
         st.session_state.failed_seismic = False
 
-    filename = st.text_input('Please pass here the whole path like: C:/Ichthys 3D.segy')
+    filename = st.text_input('Please pass here the whole path, for example: C:/Ichthys 3D.segy')
 
     # If the user chooses the other filename, then we have to reset params
     if filename != st.session_state.filename:
@@ -99,7 +99,7 @@ elif (data_option == 'Numpy2D'):
 
     if 'filename' not in st.session_state:
         st.session_state.filename = ''
-    np_text = 'Please pass here the whole path like: C:/Ichthys 3D.npy'
+    np_text = 'Please pass here the whole path, for example: C:/Ichthys 3D.npy'
     filename = st.text_input(np_text, st.session_state.filename)
 
     st.session_state.filename = filename
