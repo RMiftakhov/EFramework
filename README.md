@@ -1,7 +1,7 @@
 # EFramework-Apply AI/ML tools to your DATA
 There are a lot of good tools out there, but how can people use them? 
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/6owwDkEhkgg/0.jpg)](https://www.youtube.com/watch?v=6owwDkEhkgg)
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/n5wsGcQ3tAc/0.jpg)](https://www.youtube.com/watch?v=n5wsGcQ3tAc)
 
 ## What is it? 
 This app serves as a framework to include some of the best **open-source** O&G AI/ML tools. It democritises the use of AI tools by lifting a need to be a skilled programmer to run open-source ML tools on your own data. 
