@@ -1,25 +1,9 @@
 import streamlit as st
 from PIL import Image
-import base64
-from pathlib import Path
-import os
-
-def img_to_bytes(img_path):
-    img_bytes = Path(img_path).read_bytes()
-    encoded = base64.b64encode(img_bytes).decode()
-    return encoded
-def img_to_html(img_path, link=''):
-    img_html = "<a href='{}'><img src='data:image/png;base64,{}' class='img-fluid' width='64' height='64'>".format(
-        link,
-        img_to_bytes(img_path)
-    )
-    return img_html
+from custom_blocks import footer, sidebar
+from utils import img_to_html
 
 st.set_page_config(layout="wide")
-
-with st.sidebar:
-    st.header('Seismic')
-    st.write("- ")
 
 col1, col2 = st.columns(2)
 with col1:
@@ -88,13 +72,5 @@ st.markdown(''' *The whole list of intended AI/ML applications:*
 ''')
 
 
-# image = Image.open('images/Check Out My AIML Solutions.png')
-# col11.image(image)
-
-with st.sidebar:
-    col1, col2 = st.columns(2)
-    st.markdown("""
-    - **Seismic Type:** {}
-    - **Seismic Name:** {}
-    """.format(st.session_state.seismic_type if 'seismic_type' in st.session_state else "--", \
-        os.path.basename(st.session_state.filename) if 'filename' in st.session_state else "--"))
+footer()
+sidebar()

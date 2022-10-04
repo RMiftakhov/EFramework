@@ -1,9 +1,10 @@
+import os
 import streamlit as st
 import segyio
 import plotly.express as px
 from visualization_helpers import VISUALIZATION
-import os
 from data_classes import SegyIO3D, SegyIO2D, Numpy2D
+from custom_blocks import footer, sidebar
 
 def get_segy_header(file_name):
     f = segyio.open(file_name, ignore_geometry = True)
@@ -122,9 +123,4 @@ elif (data_option == 'Numpy2D'):
 else:
     st.error("Not implemented.")
    
-with st.sidebar:
-    col1, col2 = st.columns(2)
-    st.markdown(f"""
-    - **Seismic Type:** {st.session_state.seismic_type if 'seismic_type' in st.session_state else "--"}
-    - **Seismic Name:** {os.path.basename(filename) if 'filename' in st.session_state else "--"}
-    """ )
+sidebar()

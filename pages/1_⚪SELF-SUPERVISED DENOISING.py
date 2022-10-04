@@ -1,5 +1,5 @@
 import streamlit as st
-
+from custom_blocks import sidebar
 
 
 st.markdown("# 🧹2D Self Supervised Denoising by [Claire](https://cebirnie92.github.io/) (Links: [Paper](https://arxiv.org/abs/2109.07344), [GitHub](https://github.com/swag-kaust/Transform2022_SelfSupervisedDenoising))")
@@ -15,3 +15,5 @@ with col2:
     st.video('https://youtu.be/d9yv90-JCZ0')
 
 st.markdown("## ✨ Here we go with the APP")
+
+sidebar()
