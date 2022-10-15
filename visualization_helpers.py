@@ -1,4 +1,5 @@
 
+from random import randint
 import plotly.express as px
 import streamlit as st
 import numpy as np
@@ -18,17 +19,27 @@ class VISUALIZATION:
         self._sample_rate = _seismic_data.get_sample_rate()
         self._cmap_option = "gray"
 
+
+    def get_flt_mask(self, attr, eps):
+        flt_mask = np.ones([attr.shape[0], attr.shape[1], 4])
+        flt_mask[:, :, 0][attr > eps] = 255
+        flt_mask[:, :, 1][attr > eps] = 0
+        flt_mask[:, :, 2][attr > eps] = 0
+        flt_mask[:, :, 3][attr > eps] = 255
+        return flt_mask
+
     def plot_slice(self,_segyfile, indx_old, indx_new, last_section, cmap, vm):
         seis = np.array([[[255, 0, 0], [0, 255, 0], [0, 0, 255]],
                         [[0, 255, 0], [0, 0, 255], [255, 0, 0]]
                     ], dtype=np.uint8)
         seis_plt = px.imshow(seis)
         difference = np.abs(indx_old - indx_new)
+
         if np.any(difference):
             find_indx = np.nonzero(difference)[0]
         else:
             find_indx = [last_section]
-
+        
         if find_indx[0] == 0:
             seis = _segyfile.get_iline(indx_new[0]).T
             seis_plt = plot_inl(seis, cmap, -vm, vm)
@@ -44,17 +55,71 @@ class VISUALIZATION:
         seis_plt.update_layout(
             plot_bgcolor='rgba(0,0,0,0)')
         indx_old = indx_new
+        
         return seis, seis_plt, indx_old, last_section
 
-    def plotly_color_select(self):
+    def plot_slice_overlay(self, seis_data, attr_data, indx_old, indx_new, last_section, cmap, vm):
+        seis = np.array([[[255, 0, 0], [0, 255, 0], [0, 0, 255]],
+                        [[0, 255, 0], [0, 0, 255], [255, 0, 0]]
+                    ], dtype=np.uint8)
+        # seis_plt = px.imshow(seis)
+        difference = np.abs(indx_old - indx_new)
+
+
+        if np.any(difference):
+            find_indx = np.nonzero(difference)[0]
+        else:
+            find_indx = [last_section]
+        
+        seis_plt = go.Figure()
+        
+        if find_indx[0] == 0:
+            seis = seis_data.get_iline(indx_new[0]).T
+            attr = attr_data.get_iline(indx_new[0])
+            attr2 = self.get_flt_mask(attr, 0.9)
+            attr = self.get_flt_mask(attr.T, 0.9)
+            # seis_plt.add_trace(px.imshow(seis).data[0])
+            # seis_plt = plot_inl(seis, cmap, -vm, vm)
+            seis_plt = plot_inl(seis, cmap, -vm, vm)
+            seis_plt.add_image(z=attr, colormodel='rgba256')
+            # seis_plt.add_trace(px.imshow(attr).data[0])
+            # seis_plt.add_trace(px.imshow(attr).data[0])
+            # seis_plt.add_trace(px.imshow(attr).data[0], )
+            last_section = 0
+        elif find_indx[0] == 1:
+            seis = seis_data.get_xline(indx_new[1]).T
+            attr = attr_data.get_xline(indx_new[1]).T
+            seis_plt =  plot_xln(seis, cmap, -vm, vm)
+            attr = self.get_flt_mask(attr, 0.1)
+            seis_plt.add_trace(px.imshow(attr).data[0])
+            last_section = 1
+        elif find_indx[0] == 2:
+            seis = seis_data.get_zslice(indx_new[2]).T
+            attr = attr_data.get_zslice(indx_new[2]).T
+            seis_plt = plot_top(seis,  cmap, -vm, vm)
+            attr = self.get_flt_mask(attr, 0.1)
+            seis_plt.add_trace(px.imshow(attr).data[0])
+            last_section = 2
+        seis_plt.update_layout(
+            plot_bgcolor='rgba(0,0,0,0)')
+        indx_old = indx_new
+        
+        return seis, seis_plt, indx_old, last_section
+    def plotly_color_select(self, key, index=1):
+        """ Lists available colormaps
+
+        Returns:
+            _type_: _description_
+        """
         colorscales = ["gray", "Greys", "RdBu", "RdGy"] #px.colors.named_colorscales()
         option = st.selectbox(
             'Color Map',
-            (colorscales))
+            (colorscales), index=index, key=key)
         # st.write('You selected:', option)
         return option
+    
 
-    def visualize_seismic_3D(self, seismic_data, is_fspect, is_show_metrics=True):     
+    def visualize_seismic_3D(self, seismic_data, is_fspect, key=0, is_show_metrics=True):          
         vm, n_samples, n_il, n_xl = self._vm, self._n_samples, self._n_il, self._n_xl
 
         if is_show_metrics:
@@ -64,7 +129,75 @@ class VISUALIZATION:
             col4.metric("Number of Xline", n_xl)
             col5.metric("Sample Rate", self._sample_rate)
             with col1:
-                self._cmap_option = self.plotly_color_select()
+                self._cmap_option = self.plotly_color_select(key+1)
+
+        if 'viz_'+str(key) not in st.session_state:
+            st.session_state['viz_'+str(key)] = {"iline_old": 0, "xline_old" : 0,
+                "t_old" : 0, "last_section" : 0}
+
+        states = st.session_state['viz_'+str(key)]
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            inline_indx = st.slider('Inline', 0, n_il-1, n_il//2, key=key+2)
+        with col2:
+            xline_indx = st.slider('Xline', 0, n_xl-1, n_xl//2, key=key+3)
+        with col3:
+            time_indx = st.slider('Time', 0, n_samples-1, n_samples//2, key=key+4)
+
+
+        index_old = np.array([states['iline_old'], states['xline_old'], states['t_old']])
+        
+
+        index_new = np.array([inline_indx, xline_indx, time_indx])
+        seis, seis_3d_plot, index_old, last_section = \
+        self.plot_slice(seismic_data, index_old, index_new, states['last_section'], cmap=self._cmap_option, vm=vm)
+
+        states.update({"iline_old": index_old[0], "xline_old" : index_old[1],
+        "t_old" : index_old[2], "last_section" : last_section})
+
+        st.write(seis_3d_plot)
+        if is_fspect:
+            fspect_plt = self.plot_fspectra(seis, 'Original')
+            st.write(fspect_plt)
+
+    def visualize_sidebyside_3D(self, seismic_data, attr_data, key=0, is_show_metrics=True):          
+        vm, n_samples, n_il, n_xl = self._vm, self._n_samples, self._n_il, self._n_xl
+
+        if 'viz_'+str(key) not in st.session_state:
+            st.session_state['viz_'+str(key)] = {"iline_old": 0, "xline_old" : 0,
+                "t_old" : 0, "last_section" : 0}
+
+        states = st.session_state['viz_'+str(key)]
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            inline_indx = st.slider('Inline', 0, n_il-1, n_il//2, key=key+2)
+        with col2:
+            xline_indx = st.slider('Xline', 0, n_xl-1, n_xl//2, key=key+3)
+        with col3:
+            time_indx = st.slider('Time', 0, n_samples-1, n_samples//2, key=key+4)
+
+        index_old = np.array([states['iline_old'], states['xline_old'], states['t_old']])
+
+        index_new = np.array([inline_indx, xline_indx, time_indx])
+
+        col1, col2 = st.columns(2)
+        with col1:
+            self._cmap_option = self.plotly_color_select(key+1)
+            _ , seis_3d_plot, _ , _ = \
+            self.plot_slice(seismic_data, index_old, index_new, states['last_section'], cmap=self._cmap_option, vm=vm)
+            st.write(seis_3d_plot)
+        with col2:
+            self._cmap_option = self.plotly_color_select(key+5, index=2)
+            _ , attr_3d_plot, index_old, last_section = \
+            self.plot_slice(attr_data, index_old, index_new, states['last_section'], cmap=self._cmap_option, vm=vm)
+            st.write(attr_3d_plot)
+
+        states.update({"iline_old": index_old[0], "xline_old" : index_old[1],
+        "t_old" : index_old[2], "last_section" : last_section})
+       
+
+    def visualize_seis_attr_3D(self, seismic_data, attr_data):          
+        vm, n_samples, n_il, n_xl = self._vm, self._n_samples, self._n_il, self._n_xl
 
         if 'keys' not in st.session_state:
             st.session_state.keys = 1
@@ -84,14 +217,11 @@ class VISUALIZATION:
 
         index_old = np.array([st.session_state.iline_old, st.session_state.xline_old, st.session_state.t_old])
         index_new = np.array([inline_indx, xline_indx, time_indx])
-        # print(f"indx_old - index_new {not np.any(index_old - index_new)}")
-        # print(f"indx_new {index_new}")
         seis, seis_3d_plot, index_old, st.session_state.last_section = self.plot_slice(seismic_data, index_old, index_new, st.session_state.last_section, cmap=self._cmap_option, vm=vm)
+        # seis_3d_plot, index_old, st.session_state.last_section = self.plot_slice(seismic_data, index_old, index_new, st.session_state.last_section, cmap=self._cmap_option, vm=vm)
+        seis_3d_plot.add_trace(px.imshow(attr_data[inline_indx, :, :]).data[0])
         st.session_state.iline_old, st.session_state.xline_old, st.session_state.t_old = index_old
         st.write(seis_3d_plot)
-        if is_fspect:
-            fspect_plt = self.plot_fspectra(seis, 'Original')
-            st.write(fspect_plt)
 
     def visualize_seismic_2D(self, seismic_data, is_fspect, is_show_metrics=True):
         vm, n_samples, n_il, n_xl = self._vm, self._n_samples, self._n_il, self._n_xl

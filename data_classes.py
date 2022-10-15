@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from unittest import result
 import segyio
 import numpy as np
 import random
@@ -49,17 +50,19 @@ class SeismicData(ABC):
     def get_vm(self):
         return self.vm
 
-
-
 class SegyIO3D(SeismicData):
 
     def __init__(self, file_name, iline_byte=189, xline_byte=193):
+        super().__init__()
         self._segyfile = segyio.open(file_name, iline=int(iline_byte), xline=int(xline_byte))
 
         # get statistics for visualization
         n_slices = 10
         seis = [self.get_iline(random.randint(0, self.get_n_ilines()-1)) for i in range(n_slices)]
         self.vm = np.percentile(seis, 95)
+        self.file_name = file_name
+        self.iline_byte = iline_byte
+        self.xline_byte = xline_byte
 
     def __del__(self):
         self._segyfile.close()
@@ -93,9 +96,37 @@ class SegyIO3D(SeismicData):
     def get_vm(self):
         return self.vm
 
+    def get_file_name(self):
+        return self.file_name
+
+    def cropped_numpy(self, min_il, max_il, min_xl, max_xl, min_z, max_z):
+        """ Reads cropped seismic and returns numpy array
+
+        Args:
+            min_il (_type_): min inline
+            max_il (_type_): max inline
+            min_xl (_type_): min crossline
+            max_xl (_type_): max crossline
+            min_z (_type_): min timeslice
+            max_z (_type_): max timeslice
+        """
+        assert max_il>min_il, f"max_il must be greater than {min_il}, got: {max_il}"
+        assert max_xl>min_xl, f"max_il must be greater than {min_xl}, got: {max_xl}"
+        assert max_z>min_z,   f"max_il must be greater than {min_z}, got: {max_z}"
+
+        return np.array([self.get_iline(i)[min_xl:max_xl, min_z:max_z] for i in range(min_il, max_il)])
+
+    def get_xline_byte(self):
+        return self.xline_byte
+
+    def get_iline_byte(self):
+        return self.iline_byte
+
+
 class SegyIO2D(SeismicData):
 
     def __init__(self, file_name):
+        super().__init__()
         seismic_type = "2D"
         try: 
             with segyio.open(file_name, strict=True) as segyfile:
@@ -148,6 +179,7 @@ class SegyIO2D(SeismicData):
 class Numpy2D(SeismicData):
 
     def __init__(self, file_name):
+        super().__init__()
         self._data = np.load(file_name)
 
         # get statistics for visualization
@@ -186,3 +218,102 @@ class Numpy2D(SeismicData):
         xlim = self._data.shape[0]//int(factor)*int(factor)
         ylim = self._data.shape[1]//int(factor)*int(factor)
         self._data = self._data[:xlim, :ylim]
+
+class Numpy3D(SeismicData):
+
+    def __init__(self, file_name):
+        super().__init__()
+        self._data = np.load(file_name,allow_pickle=True)
+
+        # get statistics for visualization
+        n_slices = 10
+        seis = [self.get_iline(random.randint(0, self.get_n_ilines()-1)) for i in range(n_slices)]
+        self.vm = np.percentile(seis, 95)
+
+    def __del__(self):
+        pass
+
+    def get_iline(self, indx):
+        return self._data[indx,:,:]
+
+    def get_xline(self, indx):
+        return self._data[:,indx,:]
+
+    def get_zslice(self, indx):
+        return self._data[:,:,indx]
+
+    def get_n_ilines(self):
+        return self._data.shape[0]
+
+    # get total number of xlines
+    def get_n_xlines(self):
+        return self._data.shape[1]
+
+    def get_n_zslices(self):
+        return self._data.shape[2]
+
+    def get_sample_rate(self):
+        return 1000
+
+    def get_vm(self):
+        return self.vm
+
+    def get_cube(self):
+        return self._data
+
+    def make_axis_devisable_by(self, factor):
+        xlim = self._data.shape[0]//int(factor)*int(factor)
+        ylim = self._data.shape[1]//int(factor)*int(factor)
+        self._data = self._data[:xlim, :ylim, :]
+
+class Numpy3D(SeismicData):
+
+    def __init__(self, data):
+        super().__init__()
+        if isinstance(data, str):
+            self._data = np.load(data)
+        elif isinstance(data, np.ndarray):
+            self._data = data
+
+        # get statistics for visualization
+        if self._data is not None:
+            n_slices = 10
+            seis = [self.get_iline(random.randint(0, self.get_n_ilines()-1)) for i in range(n_slices)]
+            self.vm = np.percentile(seis, 95)
+
+    def __del__(self):
+        pass
+
+    def get_iline(self, indx):
+        return self._data[indx,:,:]
+
+    def get_xline(self, indx):
+        return self._data[:,indx,:]
+
+    def get_zslice(self, indx):
+        return self._data[:,:,indx]
+
+    def get_n_ilines(self):
+        return self._data.shape[0]
+
+    # get total number of xlines
+    def get_n_xlines(self):
+        return self._data.shape[1]
+
+    def get_n_zslices(self):
+        return self._data.shape[2]
+
+    def get_sample_rate(self):
+        return 1000
+
+    def get_vm(self):
+        return self.vm
+
+    def get_cube(self):
+        return self._data
+
+    def make_axis_devisable_by(self, factor):
+        xlim = self._data.shape[0]//int(factor)*int(factor)
+        ylim = self._data.shape[1]//int(factor)*int(factor)
+        self._data = self._data[:xlim, :ylim, :]
+    

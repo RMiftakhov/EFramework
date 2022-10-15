@@ -3,7 +3,7 @@ import streamlit as st
 import segyio
 import plotly.express as px
 from visualization_helpers import VISUALIZATION
-from data_classes import SegyIO3D, SegyIO2D, Numpy2D
+from data_classes import SegyIO3D, SegyIO2D, Numpy2D, Numpy3D
 from custom_blocks import footer, sidebar
 
 def get_segy_header(file_name):
@@ -95,7 +95,7 @@ if data_option == 'Segy3D' or data_option == 'Segy2D':
                 st.session_state.failed_seismic = True
                 st.write("Oops!  Something went wrong.  Try again...", err)
 
-elif (data_option == 'Numpy2D'):
+elif data_option == 'Numpy2D' or data_option == 'Numpy3D':
     st.title("Import Seismic As Numpy Array")
 
     if 'filename' not in st.session_state:
@@ -107,15 +107,15 @@ elif (data_option == 'Numpy2D'):
     st.write('The selected file is: ', filename)
     if filename:
         try:
-            seismic = SegyIO2D(filename) if data_option=="Segy2D" else Numpy2D(filename)
+            seismic = Numpy3D(filename) if data_option=="Numpy3D" else Numpy2D(filename)
+            st.session_state.seismic_type = "2D" if data_option=="Numpy2D" else "3D"
             # make input file devisable by 4
             seismic.make_axis_devisable_by(4)
             st.session_state.seismic = seismic
-            st.session_state.seismic_type = "2D"
 
 
             Viz = VISUALIZATION(seismic, st.session_state.seismic_type)
-            Viz.visualize_seismic_2D(seismic.get_iline(), True)
+            Viz.visualize_seismic_2D(seismic.get_iline(), is_fspect=True) if data_option=="Numpy2D" else Viz.visualize_seismic_3D(seismic, is_fspect=True)
 
             st.success('It appears that the survey is correctly read. AI/ML methods are now available in this app!')
         except RuntimeError as err: 
