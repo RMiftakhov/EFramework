@@ -21,7 +21,7 @@ class VISUALIZATION:
         self._n_il = _seismic_data.get_n_ilines()
         self._n_xl = _seismic_data.get_n_xlines()
         self._sample_rate = _seismic_data.get_sample_rate()
-        self._cmap_option = "gray"
+        self._cmap_option = "RdBu"
 
 
     def plot_slice(self, data, indx_old, indx_new, last_section, cmap, vmin, vmax):
@@ -204,6 +204,31 @@ class VISUALIZATION:
             with st.expander("Amplitude spectra"):
                 fspect_plt = self.plot_fspectra(data, 'Original')
                 st.write(fspect_plt)
+    def viz_sidebyside_2d(self, data1, data2, is_fspect, key=0, is_show_metrics=True):
+        """Viz data in 2D
+            + show metrics of the data
+            + show freq spectrum plot
+
+        Args:
+            data (SeismicData): Data for viz
+            is_fspect (bool): if to show freq spectrum plot
+            key (int, optional): Unique identifier. Defaults to 0.
+            is_show_metrics (bool, optional): if to show data metrics. Defaults to True.
+        """
+        vm, n_samples, n_il, n_xl = self._vm, self._n_samples, self._n_il, self._n_xl
+
+        if is_show_metrics:
+            col1, col2, col3, col4 = st.columns(4)
+            col2.metric("Number of Samples", n_samples)
+            col3.metric("Number of Inline", n_il)
+            col4.metric("Number of Xline", n_xl)
+            with col1:
+                self._cmap_option = self.plotly_color_select(key+1)
+        col1, col2 = st.columns(2)
+        data1_plt = plot_seis(data1,cmap=self._cmap_option, vmin=-vm, vmax=vm)
+        col1.write(data1_plt)
+        data2_plt = plot_seis(data2,cmap=self._cmap_option, vmin=-vm, vmax=vm)
+        col2.write(data2_plt)
 
     def compare_two_fig_2D(self, data1, data1_name, data2, data2_name, is_fspect, sample_rate):
         """Viz 2 sets of data with comparison slider

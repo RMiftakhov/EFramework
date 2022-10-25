@@ -54,6 +54,12 @@ def img_to_html(img_path, link=''):
 
 def img_to_html_custom(img_path, width, height, link=''):
     img_html = f"<a href='{link}'><img src='input_data:image/png;base64,{img_to_bytes(img_path)}' class='img-fluid' width='{width}' height='{height}'>"
+    img_html = "<a href='{}'><img src='data:image/png;base64,{}' class='img-fluid' width='{}' height='{}'>".format(
+        link,
+        img_to_bytes(img_path),
+        width,
+        height
+    )
     return img_html
 
 def find_files_in_directory(dir_path, ext):

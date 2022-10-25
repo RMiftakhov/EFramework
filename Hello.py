@@ -1,7 +1,21 @@
 import streamlit as st
 from PIL import Image
 from custom_blocks import footer, sidebar
-from utils import img_to_html
+# from utils import img_to_html
+
+from pathlib import Path
+import base64
+
+def img_to_bytes(img_path):
+    img_bytes = Path(img_path).read_bytes()
+    encoded = base64.b64encode(img_bytes).decode()
+    return encoded
+def img_to_html(img_path, link=''):
+    img_html = "<a href='{}'><img src='data:image/png;base64,{}' class='img-fluid' width='64' height='64'>".format(
+        link,
+        img_to_bytes(img_path)
+    )
+    return img_html
 
 st.set_page_config(layout="wide")
 
@@ -22,6 +36,7 @@ with col2:
 col11, col22, col33, col44 = st.columns(4)
 col33.markdown('## YouTube '+img_to_html('images/Square-YouTube-Logo-PNG-1024x1024.png', 'https://www.youtube.com/channel/UC1HyCbG5SO4hC7b_Ddl8cGg?sub_confirmation=1'), unsafe_allow_html=True)
 col44.markdown('## LinkedIn '+img_to_html('images/linkedin.png', 'https://www.linkedin.com/in/ruslan-miftakhov/'), unsafe_allow_html=True)
+
 
 st.markdown('---')
 st.markdown('### What this app about❓')
@@ -57,7 +72,7 @@ col33.markdown("""**Visualization**
 - 3D Interactive Seismic(section view) with user-defined colormap ✔️
 - Spectrum Frequency Plot ✔️
 - ...""")
- 
+
 st.markdown(''' *The whole list of intended AI/ML applications:*
 | Geophysics | Petrophysics | Drilling Engineering | Reservoir Engineering | Production Engineering |
 | --- | --- | --- | --- | --- | 
