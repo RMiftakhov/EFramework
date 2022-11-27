@@ -6,8 +6,8 @@ from custom_blocks import sidebar, save_data_form
 import torch
 import torch.nn as nn
 from visualization_helpers import VISUALIZATION
-from appdata.seismic.post_processing.Transform2022_SelfSupervisedDenoising.unet import UNet
-from appdata.seismic.post_processing.Transform2022_SelfSupervisedDenoising.tutorial_utils import regular_patching_2D, add_whitegaussian_noise, add_bandlimited_noise, weights_init, set_seed, make_data_loader,plot_corruption, plot_training_metrics, plot_synth_results, plot_field_results, multi_active_pixels, n2v_train, n2v_evaluate
+from appdata.geophysics.post_processing.Transform2022_SelfSupervisedDenoising.unet import UNet
+from appdata.geophysics.post_processing.Transform2022_SelfSupervisedDenoising.tutorial_utils import regular_patching_2D, add_whitegaussian_noise, add_bandlimited_noise, weights_init, set_seed, make_data_loader,plot_corruption, plot_training_metrics, plot_synth_results, plot_field_results, multi_active_pixels, n2v_train, n2v_evaluate
 import time
 
 

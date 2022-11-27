@@ -11,8 +11,8 @@ from data_classes import Numpy3D
 from utils import find_files_in_directory, predict_with_mask, std_mean_normalization
 
 from keras.models import load_model
-from appdata.seismic.faults.faultSeg.unet3 import *
-from appdata.seismic.faults.faultSeg.unet3 import cross_entropy_balanced
+from appdata.geophysics.faults.faultSeg.unet3 import *
+from appdata.geophysics.faults.faultSeg.unet3 import cross_entropy_balanced
 
 st.markdown("### 🛈 FaultSeg3D: using synthetic datasets to train an end-to-end convolutional neural network for 3D seismic fault segmentation by Xinming Wu (Links: [Paper](https://library.seg.org/doi/10.1190/geo2018-0646.1), [GitHub](https://github.com/xinwucwp/faultSeg))")
 
@@ -78,7 +78,7 @@ with st.expander("🟢 Step 2 - predict faults with machine learning"):
     st.info("Here you can select several different weights for computing faults. Try out different ones to find the best for your project.")
 
     inference_form = st.form("Inference")
-    weight_file_list = sorted(find_files_in_directory(r'appdata/seismic/faults/faultSeg/model/', '.hdf5'))
+    weight_file_list = sorted(find_files_in_directory(r'appdata/geophysics/faults/faultSeg/model/', '.hdf5'))
     weight_selected = inference_form.selectbox(
         'Available weights',
         (weight_file_list))
@@ -86,7 +86,7 @@ with st.expander("🟢 Step 2 - predict faults with machine learning"):
     if (len(weight_file_list) == 0):
         st.error('''There is no weights in the model folder. 
         Please download the pretrained models from https://drive.google.com/drive/folders/1q8sAoLJgbhYHRubzyqMi9KkTeZWXWtNd
-        and place them here EFramework/appdata/seismic/faults/faultSeg/model.
+        and place them here EFramework/appdata/geophysics/faults/faultSeg/model.
 ''')
     inference_submit = inference_form.form_submit_button("Submit")
     if inference_submit:
@@ -95,12 +95,12 @@ with st.expander("🟢 Step 2 - predict faults with machine learning"):
         numpy_data = st.session_state[module_name]['numpy_data'].get_cube()
         if (weight_selected == "pretrained_model.hdf5"):
             # load json and create model 
-            json_file = open('appdata/seismic/faults/faultSeg/model/model3.json', 'r')
+            json_file = open('appdata/geophysics/faults/faultSeg/model/model3.json', 'r')
             loaded_model_json = json_file.read()
             json_file.close()
             loaded_model = model_from_json(loaded_model_json)
             # load weights into new model
-            loaded_model.load_weights("appdata/seismic/faults/faultSeg/model/"+weight_selected)
+            loaded_model.load_weights("appdata/geophysics/faults/faultSeg/model/"+weight_selected)
             
             print("Loaded model from disk")
 
@@ -110,7 +110,7 @@ with st.expander("🟢 Step 2 - predict faults with machine learning"):
             st.session_state[module_name]['numpy_result']  = Numpy3D(100*predict)
             st.session_state[module_name]['is_predicted'] = True
         else:
-            loaded_model = load_model("appdata/seismic/faults/faultSeg/model/"+weight_selected, custom_objects={'cross_entropy_balanced': cross_entropy_balanced})
+            loaded_model = load_model("appdata/geophysics/faults/faultSeg/model/"+weight_selected, custom_objects={'cross_entropy_balanced': cross_entropy_balanced})
             print("Loaded model from disk")
             numpy_data = std_mean_normalization(numpy_data)
             print (numpy_data.shape)
