@@ -31,7 +31,7 @@ def get_inline_xline_position(file_name):
 st.markdown("# 💾 Import Seismic from File")
 data_option= st.radio(
      "🔘 There are a few options:",
-     ('Segy2D', 'Segy3D', 'Numpy2D', 'Numpy3D'), horizontal=True)
+     ('Segy2D', 'Segy3D', 'Numpy2D', 'Numpy3D'), index=1, horizontal=True)
 
 if data_option == 'Segy3D' or data_option == 'Segy2D':
     st.title("Import Seismic in SEGY format")

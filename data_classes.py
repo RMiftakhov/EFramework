@@ -126,7 +126,7 @@ class SegyIO3D(SeismicData):
         return "SEGY"
 
     def get_str_dim(self):
-        return "2D"
+        return "3D"
 
 
 class SegyIO2D(SeismicData):
@@ -202,9 +202,12 @@ class SegyIO2D(SeismicData):
 
 class Numpy2D(SeismicData):
 
-    def __init__(self, file_name):
+    def __init__(self, data):
         super().__init__()
-        self._data = np.load(file_name)
+        if isinstance(data, str):
+            self._data = np.load(data)
+        elif isinstance(data, np.ndarray):
+            self._data = data
 
         # get statistics for visualization
         seis = self.get_iline()

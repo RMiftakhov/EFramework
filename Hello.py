@@ -30,7 +30,7 @@ with col1:
     st.markdown("In 2021, I started a YouTube channel where I cover all aspects of our industry (drilling, exploration, production, and reservoir) as well as hands-on AI/ML programming using Python and Tensorflow/PyTorch.")
     st.markdown("I am updading from time to time on my website: the list of [Open-Datasets](https://ruslanmiftakhov.com/blog#!/tfeeds/937619882821/c/Datasets) and [Open-Tools](https://ruslanmiftakhov.com/blog#!/tfeeds/937619882821/c/Tools).")
 with col2:
-    st.video('https://youtu.be/6owwDkEhkgg')
+    st.video('https://youtu.be/n5wsGcQ3tAc')
 
 
 col11, col22, col33, col44 = st.columns(4)

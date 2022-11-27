@@ -66,6 +66,7 @@ class VISUALIZATION:
             last_section = 2
         seis_plt.update_layout(
             plot_bgcolor='rgba(0,0,0,0)')
+        # seis_plt.update_layout(yaxis = dict(scaleanchor = 'x'))
         indx_old = indx_new
         
         return seis, seis_plt, indx_old, last_section
@@ -134,16 +135,20 @@ class VISUALIZATION:
             fspect_plt = self.plot_fspectra(seis, 'Original')
             st.write(fspect_plt)
 
-    def viz_sidebyside_3d(self, data, attr_data, key=0):
+    def viz_sidebyside_3d(self, data, data2, minmax=False, key=0):
         """Viz 2 sets of data in 3D in side-by-side fashion
             with shared sliders
         Args:
             data (_type_): Data1 to viz
-            attr_data (_type_): Data2 to viz
+            data2 (_type_): Data2 to viz
             key (int, optional): Unique identifier. Defaults to 0.
         """
         vm, n_samples, n_il, n_xl = self._vm, self._n_samples, self._n_il, self._n_xl
-
+        vmin, vmax = -vm, vm
+        vmin2, vmax2 = vmin, vmax
+        if not minmax:
+            vmin2 = 0
+            vmax2 = 100
         if 'viz_'+str(key) not in st.session_state:
             st.session_state['viz_'+str(key)] = {"iline_old": 0, "xline_old" : 0,
                 "t_old" : 0, "last_section" : 0}
@@ -165,13 +170,13 @@ class VISUALIZATION:
         with col1:
             self._cmap_option = self.plotly_color_select(key+1)
             _ , seis_3d_plot, _ , _ = \
-            self.plot_slice(data, index_old, index_new, states['last_section'], cmap=self._cmap_option, vmin=-vm, vmax=vm)
+            self.plot_slice(data, index_old, index_new, states['last_section'], cmap=self._cmap_option, vmin=vmin, vmax=vmax)
             seis_3d_plot.update(layout_coloraxis_showscale=False)
             st.write(seis_3d_plot)
         with col2:
-            self._cmap_option = self.plotly_color_select(key+5, index=4)
+            self._cmap_option = self.plotly_color_select(key+5)
             _ , attr_3d_plot, index_old, last_section = \
-            self.plot_slice(attr_data, index_old, index_new, states['last_section'], cmap=self._cmap_option, vmin=0, vmax=1)
+            self.plot_slice(data2, index_old, index_new, states['last_section'], cmap=self._cmap_option, vmin=vmin2, vmax=vmax2)
             st.write(attr_3d_plot)
 
         states.update({"iline_old": index_old[0], "xline_old" : index_old[1],
@@ -204,7 +209,7 @@ class VISUALIZATION:
             with st.expander("Amplitude spectra"):
                 fspect_plt = self.plot_fspectra(data, 'Original')
                 st.write(fspect_plt)
-    def viz_sidebyside_2d(self, data1, data2, is_fspect, key=0, is_show_metrics=True):
+    def viz_sidebyside_2d(self, data1, data2, minmax = False, key=0, is_show_metrics=True):
         """Viz data in 2D
             + show metrics of the data
             + show freq spectrum plot
@@ -216,7 +221,10 @@ class VISUALIZATION:
             is_show_metrics (bool, optional): if to show data metrics. Defaults to True.
         """
         vm, n_samples, n_il, n_xl = self._vm, self._n_samples, self._n_il, self._n_xl
-
+        vmin, vmax = -vm, vm
+        if minmax:
+            vmin = np.min(data1) if np.min(data1) < np.min(data2) else np.min(data2)
+            vmax = np.max(data1) if np.max(data1) > np.max(data2) else np.max(data2)
         if is_show_metrics:
             col1, col2, col3, col4 = st.columns(4)
             col2.metric("Number of Samples", n_samples)
@@ -225,9 +233,9 @@ class VISUALIZATION:
             with col1:
                 self._cmap_option = self.plotly_color_select(key+1)
         col1, col2 = st.columns(2)
-        data1_plt = plot_seis(data1,cmap=self._cmap_option, vmin=-vm, vmax=vm)
+        data1_plt = plot_seis(data1,cmap=self._cmap_option, vmin=vmin, vmax=vmax)
         col1.write(data1_plt)
-        data2_plt = plot_seis(data2,cmap=self._cmap_option, vmin=-vm, vmax=vm)
+        data2_plt = plot_seis(data2,cmap=self._cmap_option, vmin=vmin, vmax=vmax)
         col2.write(data2_plt)
 
     def compare_two_fig_2D(self, data1, data1_name, data2, data2_name, is_fspect, sample_rate):

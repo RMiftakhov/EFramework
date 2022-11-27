@@ -71,23 +71,24 @@ def save_data_form(session_state, seismic, numpy_data, status):
         file_format = col3.radio( "What format? ", ('SEGY', 'NUMPY_SUBSET'))
         submitted = st.form_submit_button("Save")
         if submitted:
-            if file_format == "SEGY":
-                if seismic.get_str_format() == "SEGY":
-                    if seismic.get_str_dim() == "2D":
-                        save_to_segy_2d(seismic, path+file_name, numpy_data, session_state)
+            with st.spinner('Wait... Exporting the volume'):
+                if file_format == "SEGY":
+                    if seismic.get_str_format() == "SEGY":
+                        if seismic.get_str_dim() == "2D":
+                            save_to_segy_2d(seismic, path+file_name, numpy_data, session_state)
+                        else:
+                            save_to_segy_3d(seismic, path+file_name, numpy_data, session_state)
+                        status = "Saving SEGY complete"
                     else:
-                        save_to_segy_3d(seismic, path+file_name, numpy_data, session_state)
-                    status = "Saving SEGY complete"
+                        status = "Error: you can not save a SEGY file since the initial seismic was not SEGY."
                 else:
-                    status = "Error: you can not save a SEGY file since the initial seismic was not SEGY."
-            else:
-                save_to_numpy(path+file_name, numpy_data)
-                status = "Saving NUMPY complete"
-                # option = st.radio( "Option", ('Save subset', 'Save in original dimensions - It will create the volume in RAM. Are you sure?'))
-                # if st.form_submit_button("Save "):
-                #     if option == 'Save subset':
-                #         status = None
-                #         save_to_numpy(path+file_name, numpy_data)
-                #     else:
-                #         status = "Save in original dimensions"
+                    save_to_numpy(path+file_name, numpy_data)
+                    status = "Saving NUMPY complete"
+                    # option = st.radio( "Option", ('Save subset', 'Save in original dimensions - It will create the volume in RAM. Are you sure?'))
+                    # if st.form_submit_button("Save "):
+                    #     if option == 'Save subset':
+                    #         status = None
+                    #         save_to_numpy(path+file_name, numpy_data)
+                    #     else:
+                    #         status = "Save in original dimensions"
     return status

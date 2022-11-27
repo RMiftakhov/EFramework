@@ -7,6 +7,7 @@ import base64
 import os
 import segyio
 import time
+import itertools
 
 
 def fspectra(_input_data, dt = 1, sigma=2):
@@ -196,6 +197,41 @@ def predict_with_mask(loaded_model, input_data, os=12, normalize_patch=False, t_
     predict = predict[0:m1,0:m2,0:m3]
     return input_data, predict
 
+def regular_patching_2D(data, 
+                        patchsize=[64, 64], 
+                        step=[16, 16], 
+                        verbose=True):
+    """ Regular sample and extract patches from a 2D array
+    code adapted from: https://github.com/swag-kaust/Transform2022_SelfSupervisedDenoising  
+    :param data: np.array [y,x]
+    :param patchsize: tuple [y,x]
+    :param step: tuple [y,x]
+    :param verbose: boolean
+    :return: np.array [patch#, y, x]
+    """
+    assert patchsize[0]<data.shape[0], f"Number of pixels in the patch has to be smaller than the dimention of the seismic {data.shape}."
+    assert patchsize[1]<data.shape[1], f"Number of pixels in the patch has to be smaller than the dimention of the seismic {data.shape}."
+
+    # find starting indices
+    x_start_indices = np.arange(0, data.shape[0] - patchsize[0], step=step[0])
+    y_start_indices = np.arange(0, data.shape[1] - patchsize[1], step=step[1])
+    # add the last patch in XY that might be missed
+    if (data.shape[0]>x_start_indices[-1]):
+        x_start_indices = np.append(x_start_indices, [data.shape[0]-patchsize[0]])  
+    if (data.shape[0]>x_start_indices[-1]):
+        y_start_indices = np.append(y_start_indices, [data.shape[1]-patchsize[1]])      
+    starting_indices = list(itertools.product(x_start_indices, y_start_indices))
+
+    if verbose:
+        print('Extracting %i patches' % len(starting_indices))
+
+    patches = np.zeros([len(starting_indices), patchsize[0], patchsize[1]])
+
+    for i, pi in enumerate(starting_indices):
+        patches[i] = data[pi[0]:pi[0]+patchsize[0], pi[1]:pi[1]+patchsize[1]]
+
+    return patches, starting_indices
+
 def save_to_numpy(file_path, numpy_data):
     np.save(file_path, numpy_data)
 
@@ -235,19 +271,17 @@ def save_to_segy_3d(original_segy, file_path, numpy_data, session_state):
                 for itrace in range(dst.tracecount):
                     dst.header[itrace] =  src.header[itrace]
                     dst.trace[itrace] = np.zeros(len(src.samples)).astype('float32') 
+                iter = 0
+                for i in range(src.ilines.min(), src.ilines.max()):
+                    data = numpy_data[iter]
+                    dst.iline[i] = data.astype('float32')
+                    iter = iter + 1
             else:
                 for itrace in range(dst.tracecount):
                     dst.header[itrace] =  src.header[itrace]
                     dst.trace[itrace] = np.zeros(len(src.samples)).astype('float32')
-                # iter = 0
-                # for i in range(cropped_info[0,0], cropped_info[0,1]-1):
-                #     for j in range(cropped_info[1,0], cropped_info[1,1]-1):
-                #         indx = j + i * ny
-                #         # st.write(f"inter {iter}, i {i}, j {j}")
-                #         dst.trace[indx] = numpy_results[iter, :].astype('float32') #np.ones(len(src.samples)).astype('float32')#
-                #         iter = iter + 1
                 iter = 0
-                for i in range(cropped_info[0,0]+1, cropped_info[0,1]+1):
+                for i in range(src.ilines.min() + cropped_info[0,0], src.ilines.min() + cropped_info[0,1] ): # +1
                     data = np.zeros([ny, nz]) 
                     data[cropped_info[1,0]:cropped_info[1,1], cropped_info[2,0]:cropped_info[2,1]] = numpy_data[iter]
                     dst.iline[i] = data.astype('float32')
@@ -264,7 +298,9 @@ def save_to_segy_2d(original_segy, file_path, numpy_data, session_state):
         spec.format = int(src.format)
         spec.samples =  src.samples[:] 
         spec.tracecount = src.tracecount
-        st.write(f"Numpy SHAPE {numpy_data.shape} sample {len(src.samples)}")
+
+        # st.write(f"Saving 2D segy. Numpy SHAPE {numpy_data.shape} sample {len(src.samples)}")
+
         spec.ilines = src.ilines
 
         nz = original_segy.get_n_zslices()
