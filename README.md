@@ -28,4 +28,6 @@ In most cases, I'll include code that allows you to enter the example data *(or 
 4. Activate the enviroment `conda activate EFramework`
 5. Run the app `streamlit run Hello.py`
 
-
+## Modules
+- [SeismicSelfDenoise2D](https://github.com/RMiftakhov/EFramework-SeismicSelfDenoise2D) an adaptation of the 2D Self Supervised Seismic Denoising
+- [FaultSeg3D](https://github.com/RMiftakhov/EFramework-FaultSeg3D)
