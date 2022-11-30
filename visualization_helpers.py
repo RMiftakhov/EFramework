@@ -209,14 +209,16 @@ class VISUALIZATION:
             with st.expander("Amplitude spectra"):
                 fspect_plt = self.plot_fspectra(data, 'Original')
                 st.write(fspect_plt)
-    def viz_sidebyside_2d(self, data1, data2, minmax = False, key=0, is_show_metrics=True):
+    def viz_sidebyside_2d(self, data1, data2, is_fspect, minmax = False, key=0, is_show_metrics=True):
         """Viz data in 2D
             + show metrics of the data
             + show freq spectrum plot
 
         Args:
-            data (SeismicData): Data for viz
+            data1 (SeismicData): Data for viz
+            data2 (SeismicData): Data for viz
             is_fspect (bool): if to show freq spectrum plot
+            minmax (bool): min-max normalization
             key (int, optional): Unique identifier. Defaults to 0.
             is_show_metrics (bool, optional): if to show data metrics. Defaults to True.
         """
@@ -237,6 +239,12 @@ class VISUALIZATION:
         col1.write(data1_plt)
         data2_plt = plot_seis(data2,cmap=self._cmap_option, vmin=vmin, vmax=vmax)
         col2.write(data2_plt)
+        if is_fspect:
+            with st.expander("Amplitude spectra"):
+                smooth = 2.0
+                fspect_plt = plot_fspectra(data1, data1_name, sample_rate, smooth, data2=data2, data2_name=data2_name)
+                st.write(fspect_plt)
+
 
     def compare_two_fig_2D(self, data1, data1_name, data2, data2_name, is_fspect, sample_rate):
         """Viz 2 sets of data with comparison slider

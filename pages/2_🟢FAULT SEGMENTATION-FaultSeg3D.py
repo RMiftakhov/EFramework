@@ -123,6 +123,7 @@ with st.expander("🟢 Step 2 - predict faults with machine learning"):
 
 
 with st.expander("🟢 Step 3 - save the computed fault probability cube"):
+    st.write("")
     if st.session_state[module_name]['is_predicted']:
         st.session_state[module_name]['step3_status'] = save_data_form(st.session_state[module_name], seismic, st.session_state[module_name]['numpy_result'].get_cube(), st.session_state[module_name]['step3_status'])
         st.info(st.session_state[module_name]['step3_status'])
