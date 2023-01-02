@@ -31,3 +31,5 @@ In most cases, I'll include implementation that allows you to enter the example 
 ## Integrated Modules
 - [SeismicSelfDenoise2D](https://github.com/swag-kaust/Transform2022_SelfSupervisedDenoising) - 2D Self Supervised Seismic Denoising. Self-supervised learning offers a solution to the common limitation of the lack of noisy-clean pairs of data for training deep learning seismic denoising procedures/
 - [FaultSeg3D](https://github.com/xinwucwp/faultSeg) - End-to-end convolutional neural network for 3D seismic fault segmentation that trained using synthetic datasets. 
+
+All code comes as is, with no guarantees. All credit for original work to the authors of respective publications and implementations.
