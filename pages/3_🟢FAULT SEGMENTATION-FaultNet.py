@@ -1,11 +1,9 @@
-import torch
+
 import os
 import numpy as np
 
 import git
 from tqdm import tqdm
-
-from ast import Assert
 import streamlit as st
 from custom_blocks import sidebar, crop_and_load_volume, save_data_form
 from visualization_helpers import VISUALIZATION
@@ -62,12 +60,10 @@ st.video('https://youtu.be/PxSNxuqaE14')
 
 st.markdown("## 🔰 Install external dependencies")
 with st.expander("GPU version"):
-    st.code('''conda install -c anaconda keras-gpu
-conda install -c anaconda tensorflow-gpu 
+    st.code('''conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch 
 conda install -c anaconda scikit-image''')
 with st.expander("CPU version"):
-    st.code('''conda install -c conda-forge keras 
-conda install -c conda-forge tensorflow 
+    st.code('''conda install pytorch torchvision torchaudio cpuonly -c pytorch 
 conda install -c anaconda scikit-image''')
 
 st.markdown("## 🧬 Clone the FaultNet repository")
@@ -82,6 +78,8 @@ if is_clone:
         st.warning("The path ./appdata/geophysics/faults/FaultNet/ already exist.")
 
 st.markdown("## ✨ Here we go with the APP")
+
+import torch
 
 if "seismic" not in st.session_state or st.session_state.seismic_type=="2D":
         st.error("Please import 3D seismic first")
