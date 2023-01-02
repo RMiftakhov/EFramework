@@ -73,6 +73,10 @@ def find_files_in_directory(dir_path, ext):
             res.append(file)
     return res
 
+def min_max_normalization(data):
+    _range = np.max(data) - np.min(data)
+    return (data - np.min(data)) / _range
+
 def std_mean_normalization(input_data):
     """_summary_
 
@@ -122,6 +126,8 @@ def get_mask(os, t_dim=[128,128,128]):
                     sc[k1][k2][k3]=sp[k3]
                     sc[k1][k2][n3-k3-1]=sp[k3]
     return sc
+
+
 
 def predict_with_mask(loaded_model, input_data, os=12, normalize_patch=False, t_dim=[128,128,128]):
     """ function that predicts the whole slice with a window-based approach 
