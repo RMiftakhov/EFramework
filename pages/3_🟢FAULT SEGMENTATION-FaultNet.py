@@ -1,4 +1,3 @@
-
 import os
 import numpy as np
 
@@ -74,7 +73,7 @@ if is_clone:
     if is_path_exist == False:
         with st.spinner("Clonning the repo"):
             git.Repo.clone_from("https://github.com/douyimin/FaultNet.git", "./appdata/geophysics/faults/FaultNet", progress=CloneProgress())
-    else: 
+    else:
         st.warning("The path ./appdata/geophysics/faults/FaultNet/ already exist.")
 
 st.markdown("## ✨ Here we go with the APP")

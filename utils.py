@@ -13,6 +13,11 @@ import itertools
 def fspectra(_input_data, dt = 1, sigma=2):
     """
     Calculate the frequency spectra
+    
+    @param _input_data: input data for which the frequency spectra is to be calculated
+    @param dt: sample interval in milliseconds (default: 1)
+    @param sigma: sigma value for gaussian filter (default: 2)
+    @return: tuple of frequency values and amplitude values of the spectra
     """
     # Amplitude values
 
@@ -29,12 +34,28 @@ def fspectra(_input_data, dt = 1, sigma=2):
     return f, gaussian_filter(a, sigma=sigma)
 
 def signaltonoise_dB(a, axis=0, ddof=0):
+    """
+    Calculate the signal-to-noise ratio in decibels
+    
+    @param a: input array
+    @param axis: axis along which the mean and standard deviation is calculated (default: 0)
+    @param ddof: degrees of freedom for the standard deviation calculation (default: 0)
+    @return: signal-to-noise ratio in decibels
+    """
     a = np.asanyarray(a)
     m = a.mean(axis)
     sd = a.std(axis=axis, ddof=ddof)
     return 20*np.log10(abs(np.where(sd == 0, 0, m/sd)))
 
 def signaltonoise(a, axis=0, ddof=0):
+    """
+    Calculate the signal-to-noise ratio
+    
+    @param a: input array
+    @param axis: axis along which the mean and standard deviation is calculated (default: 0)
+    @param ddof: degrees of freedom for the standard deviation calculation (default: 0)
+    @return: signal-to-noise ratio
+    """
     a = np.asanyarray(a)
     m = a.mean(axis)
     sd = a.std(axis=axis, ddof=ddof)
@@ -42,18 +63,40 @@ def signaltonoise(a, axis=0, ddof=0):
 
 
 def img_to_bytes(img_path):
+    """
+    Convert an image to bytes and then base64 encode the bytes
+    
+    @param img_path: path to the image file
+    @return: base64 encoded image as a string
+    """
     img_bytes = Path(img_path).read_bytes()
     encoded = base64.b64encode(img_bytes).decode()
     return encoded
 
 def img_to_html(img_path, link=''):
+    """
+    Convert an image to HTML code with an optional link.
+
+    @param img_path: path to the image file
+    @param link: optional link to add to the image
+    @return: HTML code for the image
+    """
     img_html = "<a href='{}'><img src='input_data:image/png;base64,{}' class='img-fluid' width='64' height='64'>".format(
-        link,
-        img_to_bytes(img_path)
+    link,
+    img_to_bytes(img_path)
     )
     return img_html
 
 def img_to_html_custom(img_path, width, height, link=''):
+    """
+    Convert an image to HTML code with custom width and height and an optional link.
+
+    @param img_path: path to the image file
+    @param width: width of the image in HTML
+    @param height: height of the image in HTML
+    @param link: optional link to add to the image
+    @return: HTML code for the image
+    """
     img_html = f"<a href='{link}'><img src='input_data:image/png;base64,{img_to_bytes(img_path)}' class='img-fluid' width='{width}' height='{height}'>"
     img_html = "<a href='{}'><img src='data:image/png;base64,{}' class='img-fluid' width='{}' height='{}'>".format(
         link,
@@ -64,6 +107,13 @@ def img_to_html_custom(img_path, width, height, link=''):
     return img_html
 
 def find_files_in_directory(dir_path, ext):
+    """
+    Find all files in a directory with a specific file extension.
+
+    @param dir_path: path to the directory
+    @param ext: file extension to search for
+    @return: list of files with the specified extension in the directory
+    """
     # list to store files
     res = []
     # Iterate directory
@@ -73,7 +123,14 @@ def find_files_in_directory(dir_path, ext):
             res.append(file)
     return res
 
+
 def min_max_normalization(data):
+    """
+    Normalize data using min-max normalization.
+
+    @param data: data to normalize
+    @return: normalized data
+    """
     _range = np.max(data) - np.min(data)
     return (data - np.min(data)) / _range
 
@@ -88,43 +145,45 @@ def std_mean_normalization(input_data):
     """
     return (input_data - np.mean(input_data)) / np.std(input_data)
 
+
 def get_mask(os, t_dim=[128,128,128]):
-    """set gaussian weights in the overlap boundaries
-       code adapted from https://github.com/xinwucwp/faultSeg
+    """
+    Create a mask of specified dimensions with values decaying from 1 to 0 at the edges.
 
-    Args:
-        os (_type_): overlap width
-        t_dim (list, optional): training image dimensions. Defaults to [128,128,128].
-
-    Returns:
-        _type_: _description_
+    @param os: length of the edge transition
+    @param t_dim: dimensions of the mask (default: [128,128,128])
+    @return: 3D mask of specified dimensions
     """
     # training image dimensions
     n1, n2, n3 = t_dim[0], t_dim[1], t_dim[2]
-
+    # initialize mask with all 1's
     sc = np.zeros((n1,n2,n3),dtype=np.single)
     sc = sc+1
+
+    # create decay values for edge transition
     sp = np.zeros((os),dtype=np.single)
     sig = os/4
     sig = 0.5/(sig*sig)
     for ks in range(os):
         ds = ks-os+1
         sp[ks] = np.exp(-ds*ds*sig)
-        for k1 in range(os):
-            for k2 in range(n2):
-                for k3 in range(n3):
-                    sc[k1][k2][k3]=sp[k1]
-                    sc[n1-k1-1][k2][k3]=sp[k1]
-        for k1 in range(n1):
-            for k2 in range(os):
-                for k3 in range(n3):
-                    sc[k1][k2][k3]=sp[k2]
-                    sc[k1][n3-k2-1][k3]=sp[k2]
-        for k1 in range(n1):
-            for k2 in range(n2):
-                for k3 in range(os):
-                    sc[k1][k2][k3]=sp[k3]
-                    sc[k1][k2][n3-k3-1]=sp[k3]
+
+    # apply decay values to edges of mask
+    for k1 in range(os):
+        for k2 in range(n2):
+            for k3 in range(n3):
+                sc[k1][k2][k3]=sp[k1]
+                sc[n1-k1-1][k2][k3]=sp[k1]
+    for k1 in range(n1):
+        for k2 in range(os):
+            for k3 in range(n3):
+                sc[k1][k2][k3]=sp[k2]
+                sc[k1][n3-k2-1][k3]=sp[k2]
+    for k1 in range(n1):
+        for k2 in range(n2):
+            for k3 in range(os):
+                sc[k1][k2][k3]=sp[k3]
+                sc[k1][k2][n3-k3-1]=sp[k3]
     return sc
 
 

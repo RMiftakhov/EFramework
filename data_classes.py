@@ -3,53 +3,109 @@ from unittest import result
 import segyio
 import numpy as np
 import random
-random.seed(1)
 
+# Class SeismicData
+# 
+# Abstract class for handling 3D seismic data.
 class SeismicData(ABC):
 
     @abstractmethod
     def __init__(self):
+        """Initialize the object"""
         pass
 
     @abstractmethod
     def __del__(self):
+        """Cleanup the object"""
         pass
 
     @abstractmethod
     def get_iline(self, indx):
+        """Get the inline data of a given index
+
+        Args:
+            indx (int): index of the inline
+
+        Returns:
+            numpy.ndarray : inline data
+        """
         pass
 
     @abstractmethod
     def get_xline(self, indx):
+        """Get the crossline data of a given index
+
+        Args:
+            indx (int): index of the crossline
+
+        Returns:
+            numpy.ndarray : crossline data
+        """
         pass
 
     @abstractmethod
     def get_zslice(self, indx):
+        """Get the time slice data of a given index
+
+        Args:
+            indx (int): index of the time slice
+
+        Returns:
+            numpy.ndarray : time slice data
+        """
         pass
     
     # get total number of ilines
     @abstractmethod
     def get_n_ilines(self):
+        """Get total number of ilines
+
+        Returns:
+            int : number of ilines
+        """
         pass
 
     # get total number of xlines
     @abstractmethod
     def get_n_xlines(self):
+        """Get total number of xlines
+
+        Returns:
+            int : number of xlines
+        """
         pass
 
     # get total number of zslices
     @abstractmethod
     def get_n_zslices(self):
+        """Get total number of zslices
+
+        Returns:
+            int : number of zslices
+        """
         pass
 
     @abstractmethod
     def get_sample_rate(self):
+        """Get the sample rate of the data
+
+        Returns:
+            float : sample rate
+        """
         pass
 
     @abstractmethod
     def get_vm(self):
+        """Get the visualization threshold for the data
+
+        Returns:
+            float : visualization threshold
+        """
         pass
 
+# Class SegyIO3D
+#
+# A concrete implementation of the SeismicData abstract class using segyio library.
 class SegyIO3D(SeismicData):
 
     def __init__(self, file_name, iline_byte=189, xline_byte=193):
@@ -146,6 +202,8 @@ class SegyIO2D(SeismicData):
                 self._dt = segyio.tools.dt(segyfile)
                 self.vm = np.percentile(self._data, 95)
                 self.file_name = file_name
+        self.iline_byte = 189
+        self.xline_byte = 193
 
 
     def __del__(self):
