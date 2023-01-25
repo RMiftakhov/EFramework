@@ -4,9 +4,7 @@
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/n5wsGcQ3tAc/0.jpg)](https://www.youtube.com/watch?v=n5wsGcQ3tAc)
 
 ## What is it? 
-This app serves as a framework to include some of the best **open-source** Energy Machine Learning tools. It aims at democritising the use of AI tools by lifting a need to be a skilled programmer to run open-source ML tools on your data. 
-
-In most cases, I'll include implementation that allows you to enter the example data *(or your own)*, compute it, and save the results in each application.
+Introducing EFramework, an open-source development tool designed to democratize the use of AI in the oil and gas industry. Our app serves as a framework to bring together some of the best open-source AI/ML tools in the industry, making them accessible to a wider range of users. With EFramework, there is no need to be a skilled programmer to run open-source ML tools on your own data.We provide easy-to-use code that allows you to input example data (or your own) and compute it, saving the results in each application. This means you can easily explore and experiment with different AI tools, without needing extensive programming knowledge. EFramework is a valuable resource for professionals and researchers in the oil and gas industry, as well as anyone interested in learning more about the potential of AI in this field.
 
 *The list of intended AI/ML applications:*
 | Geophysics | Petrophysics | Drilling Engineering | Reservoir Engineering | Production Engineering |
@@ -30,6 +28,7 @@ In most cases, I'll include implementation that allows you to enter the example 
 
 ## Integrated Modules
 - [SeismicSelfDenoise2D](https://github.com/swag-kaust/Transform2022_SelfSupervisedDenoising) - 2D Self Supervised Seismic Denoising. Self-supervised learning offers a solution to the common limitation of the lack of noisy-clean pairs of data for training deep learning seismic denoising procedures/
-- [FaultSeg3D](https://github.com/xinwucwp/faultSeg) - End-to-end convolutional neural network for 3D seismic fault segmentation that trained using synthetic datasets. 
+- [FaultSeg3D](https://github.com/xinwucwp/faultSeg) - End-to-end convolutional neural network for 3D seismic fault segmentation that trained using synthetic datasets.
+- [FaultNet](https://github.com/douyimin/FaultNet) - Efficient Training of 3D Seismic Fault Segmentation Network under Sparse Labels by Weakening Anomaly Annotation
 
 All code comes as is, with no guarantees. All credit for original work to the authors of respective publications and implementations.
