@@ -16,18 +16,40 @@ from scipy.interpolate import interp2d
 
 
 class CloneProgress(git.RemoteProgress):
-    """ This class for tracking the clonning progress
+    """Class for tracking cloning progress of a git repository.
+    
+    Inherits from git.RemoteProgress and integrates with tqdm progress bar
+    for a more user-friendly output.
     """
     def __init__(self):
         super().__init__()
         self.pbar = tqdm()
 
     def update(self, op_code, cur_count, max_count=None, message=''):
+        """Updates the progress bar based on the current progress.
+        
+        Args:
+            op_code (int): Operation code representing the current git operation.
+            cur_count (int): Current progress count.
+            max_count (int, optional): Maximum progress count. Defaults to None.
+            message (str, optional): A message to display alongside the progress. Defaults to ''.
+        """
         self.pbar.total = max_count
         self.pbar.n = cur_count
         self.pbar.refresh()
 
 def predict_patch(data, dev, patchsize, step):
+    """Predicts an output for a given input using a pre-trained model with regular patching.
+    
+    Args:
+        data (np.array): Input data for prediction.
+        dev (torch.device): Device to use for prediction (CPU or GPU).
+        patchsize (tuple): Dimensions of the patches to be used for input.
+        step (int): Step size for the regular patching.
+
+    Returns:
+        np.array: Output prediction.
+    """
     patches, starting_indices = regular_patching_2D(data, 
                         patchsize=patchsize,
                         step=step,
@@ -43,6 +65,15 @@ def predict_patch(data, dev, patchsize, step):
     return prediction
 
 def predict_slice(data, dev):
+    """Predicts an output for a given input using a pre-trained model.
+    
+    Args:
+        data (np.array): Input data for prediction.
+        dev (torch.device): Device to use for prediction (CPU or GPU).
+
+    Returns:
+        np.array: Output prediction.
+    """
     torch_data = torch.from_numpy(np.expand_dims(np.expand_dims(data,axis=0),axis=0)).float()
     if (dev == torch.device("cuda")):
         torch_data = torch_data.cuda()
@@ -51,7 +82,17 @@ def predict_slice(data, dev):
     return prediction
 
 
+
 def resize_array(arr1, arr2):
+    """Resizes arr2 to match the dimensions of arr1 using linear interpolation.
+
+    Args:
+        arr1 (np.array): Reference array whose dimensions should be matched.
+        arr2 (np.array): Array to be resized.
+
+    Returns:
+        np.array: Resized array.
+    """
     # Get the dimensions of the two arrays
     n1, m1 = arr1.shape
     n2, m2 = arr2.shape
@@ -67,6 +108,16 @@ def resize_array(arr1, arr2):
     return arr2_interp
 
 def copy_to_top(file1_path, file2_path):
+    """Merges the contents of two files, avoiding duplication.
+
+    Merges the contents of file1_path into file2_path. Removes any references
+    to 'common.' from file2_path and skips merging if the files have already
+    been merged.
+
+    Args:
+        file1_path (str): Path to the first file.
+        file2_path (str): Path to the second file.
+    """
     marker = "# MERGED CONTENTS - DO NOT DUPLICATE"
 
     # Read the contents of the first file
@@ -91,6 +142,7 @@ def copy_to_top(file1_path, file2_path):
     # Write the marker, contents of the first file, and modified contents of the second file
     with open(file2_path, 'w') as file2:
         file2.write(marker + "\n" + file1_content + "\n" + file2_content)
+
 
 st.markdown("### 🛈 Deep Learning for Simultaneous Seismic Image Super-Resolution and Denoising by Jintao Li (Links: [Paper](https://ieeexplore.ieee.org/abstract/document/9364884), [GitHub](https://github.com/JintaoLee-Roger/SeismicSuperResolution))")
 
