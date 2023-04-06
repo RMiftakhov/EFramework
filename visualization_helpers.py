@@ -1,4 +1,3 @@
-
 from random import randint
 import plotly.express as px
 import streamlit as st
@@ -209,6 +208,7 @@ class VISUALIZATION:
             with st.expander("Amplitude spectra"):
                 fspect_plt = self.plot_fspectra(data, 'Original')
                 st.write(fspect_plt)
+
     def viz_sidebyside_2d(self, data1, data2, is_fspect, minmax = False, key=0, is_show_metrics=True):
         """Viz data in 2D
             + show metrics of the data
@@ -242,7 +242,7 @@ class VISUALIZATION:
         if is_fspect:
             with st.expander("Amplitude spectra"):
                 smooth = 2.0
-                fspect_plt = plot_fspectra(data1, data1_name, sample_rate, smooth, data2=data2, data2_name=data2_name)
+                fspect_plt = plot_fspectra(data1, "data1", self._sample_rate, smooth, data2=data2, data2_name="data2")
                 st.write(fspect_plt)
 
 

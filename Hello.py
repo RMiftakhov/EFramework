@@ -26,9 +26,9 @@ with col1:
 col1, col2 = st.columns(2)
 with col1:
     
-    st.markdown("I am CTO at [Geoplat](https://geoplat.ai), and I am passionate about AI and its applications in the oil and gas industry. I have spent many years learning, teaching, developing, and launching AI-based solutions for geoscience and petroleum engineering.", unsafe_allow_html=True)
-    st.markdown("In 2021, I started a YouTube channel where I cover all aspects of our industry (drilling, exploration, production, and reservoir) as well as hands-on AI/ML programming using Python and Tensorflow/PyTorch.")
-    st.markdown("I am updading from time to time on my website: the list of [Open-Datasets](https://ruslanmiftakhov.com/blog#!/tfeeds/937619882821/c/Datasets) and [Open-Tools](https://ruslanmiftakhov.com/blog#!/tfeeds/937619882821/c/Tools).")
+    st.markdown("As the Chief Technical Officer of [Geoplat](https://geoplat.ai), my passion for AI and its applications in the oil and gas industry drives my work. With years of experience in learning, teaching, developing, and launching AI-based solutions for geoscience and petroleum engineering, I am dedicated to advancing the use of technology in our industry.", unsafe_allow_html=True)
+    st.markdown("In 2021, I launched a YouTube channel to share my knowledge and expertise in all aspects of the oil and gas industry, including drilling, exploration, production, and reservoir management. I also provide hands-on instruction on AI/ML programming using Python and Tensorflow/PyTorch.")
+    st.markdown("I am continuously updating my website with the latest resources, including  [Open-Datasets](https://ruslanmiftakhov.com/blog#!/tfeeds/937619882821/c/Datasets) and [Open-Tools](https://ruslanmiftakhov.com/blog#!/tfeeds/937619882821/c/Tools), to help others in the industry stay informed and stay ahead of the curve.")
 with col2:
     st.video('https://youtu.be/n5wsGcQ3tAc')
 
@@ -39,10 +39,10 @@ col44.markdown('## LinkedIn '+img_to_html('images/linkedin.png', 'https://www.li
 
 
 st.markdown('---')
-st.markdown('### What this app about❓')
+st.markdown('### What is this app about❓')
 
-st.markdown('This app serves as a framework to include some of the best **open-source** O&G AI/ML tools. It democritises the use of AI tools by lifting a need to be a skilled programmer to run open-source ML tools on your own data. \
-In most cases, I will include code that allows you to enter the example data (or your own), compute it, and save the results in each application.')
+st.markdown('Introducing EFramework, an open-source development tool designed to democratize the use of AI in the oil and gas industry. Our app serves as a framework to bring together some of the best open-source AI/ML tools in the industry, making them accessible to a wider range of users. With EFramework, there is no need to be a skilled programmer to run open-source ML tools on your own data.\
+We provide easy-to-use code that allows you to input example data (or your own) and compute it, saving the results in each application. This means you can easily explore and experiment with different AI tools, without needing extensive programming knowledge. EFramework is a valuable resource for professionals and researchers in the oil and gas industry, as well as anyone interested in learning more about the potential of AI in this field.')
 
 col11, col22, col33 = st.columns(3)
 col11.markdown("""**Open AI/ML Algorithms** 
